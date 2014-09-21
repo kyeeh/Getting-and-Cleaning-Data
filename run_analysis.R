@@ -1,3 +1,4 @@
+## Author: Ricardo Gutiérrez (https://github.com/kyeeh/Getting-and-Cleaning-Data)
 ## Run Analysis script
 
 # Merges the training and the test sets to create one data set.
@@ -7,10 +8,11 @@
 # Creates a second, independent tidy data set with the average of each variable for each activity and each subject. 
 
 # Getting and Cleaning Dara Project
-# Created at: 09/21/2014
+# Created at: 09/11/2014
 
-# Libraries
+# Libraries & workspace
 library("reshape2")
+setwd("~/Documents/Coursera/dss/workspace/Getting-and-Cleaning-Data")
 
 # Start with file uploading
 activities <- read.table("UCI\ HAR\ Dataset/activity_labels.txt")
@@ -43,16 +45,18 @@ remove(training_labels,training_set,testing_labels,testing_set,features,subject_
 
 # merging data frames
 df <- rbind(testing,training)
-# remove(testing,training)
+remove(testing,training)
 
 # Using descriptive activity names in Dataset
 df <- merge(activities,df,by.x="id",by.y="activity_id",all=TRUE)
 df <- subset(df,select=-c(1))
 
 # Selecting Mean and Standart Deviation for each measurement
-df1 <- df[,c(3,2,grep("mean[[:punct:]]|std[[:punct:]]",names(df)))]
+df <- df[,c(1,2,grep("mean[[:punct:]]|std[[:punct:]]",names(df)))]
 
-# Preparing Output file
+# Reshaping output
 mdata <- melt(df,id=c("subject","activity"))
-df2 <- dcast(mdata, subject + activity ~ variable, mean)
-write.table(df2,"output.txt",row.name=FALSE)
+output <- dcast(mdata, subject + activity ~ variable, mean)
+
+# Writing Output file
+write.table(output,"output.txt",row.name=FALSE,sep="\t")
